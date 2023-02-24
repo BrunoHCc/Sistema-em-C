@@ -8,7 +8,7 @@
 //                                            cria o tipo Prof
 struct Prof{
     /*propriedade unica - reg_func*/
-    int reg_func , data, telefones[2], salario;
+    int reg_func , data, telefones[3];
     char cargo[50], nome[50], sexo, area[50], titulo[50], grad[50], email[2][50];
 };
 
@@ -18,6 +18,14 @@ struct Disc{
      /*propriedade unica - sigla*/
     int numcred, cargahora;
     char sigla[4], nome[50], ementa[100], bibliografia[50];
+};
+
+///////////////////////////////////////////////////////////////
+//                                      cria o tipo Prof-Disciplina
+struct ProfDisc{
+     /*propriedade unica - Registro,sigla,ano,semestre*/
+    int reg_func, ano, semestre;
+    char sigla[4], dias[30], horario[6], curso[50];
 };
 
 ///////////////////////////////////////////////////////////////
@@ -53,8 +61,9 @@ int cadastraprof(struct Prof professores[], int *posprof)
         fflush(stdin);
         printf("Digite o data de nascimento do professor dia/mes/ano, apenas numeros! (01012004)\n>>");
         scanf("%d", &professores[*posprof].data);
+		fflush(stdin);
         printf("Digite o sexo m (masculino) ou f (feminino)\n>>");
-        scanf(" %c", &professores[*posprof].sexo);
+        scanf("%c", &professores[*posprof].sexo);
         fflush(stdin);
         printf("Digite a area de pesquisa do professor\n>>");
         gets(professores[*posprof].area);
@@ -70,12 +79,12 @@ int cadastraprof(struct Prof professores[], int *posprof)
         scanf("%d", &segundoemail);
         fflush(stdin);
         if(segundoemail == 1){
-        	printf(">>");
+        	printf("\n>>");
             gets(professores[*posprof].email[1]);
             fflush(stdin);
         }
         else{
-        	strcpy(professores[*posprof].email[1],0);
+        	strcpy(professores[*posprof].email[1],"0");
 		}
         //adiciona telefones
         printf("Digite o/os telefones do professor (até 2)(apenas numeros)\n>>");
@@ -85,7 +94,7 @@ int cadastraprof(struct Prof professores[], int *posprof)
         fflush(stdin);
         if(segundotelefone == 1){
         	printf(">>");
-            scanf("%d", professores[*posprof].telefones[1]);
+            scanf("%d", professores[achou].telefones[1]);
         }
         else{
         	professores[*posprof].telefones[1]=0;
@@ -103,15 +112,16 @@ int cadastraprof(struct Prof professores[], int *posprof)
 void listarTodosProf(struct Prof professores[], int *tamanho)
 {
 	int i,j,k;
-	for (i=0;i<*tamanho;i++){
+	for (i=0;i<(*tamanho);i++){
 		printf("\nRegistro Funcional: %d \nNome: %s \nData de Nascimento: %d", professores[i].reg_func, professores[i].nome, professores[i].data);
-		printf("\nSexo: %s \nArea de pesquisa: %s \nTitulacao: %s \nGraduacao: %s", professores[i].sexo, professores[i].area, professores[i].titulo, professores[i].grad);
+		printf("\nSexo: %c \nArea de pesquisa: %s \nTitulacao: %s \nGraduacao: %s", professores[i].sexo, professores[i].area, professores[i].titulo, professores[i].grad);
 		for(j=0;j<2;j++){
 			printf("\nEmail: %s",professores[i].email[j]);
 		}
 		for(k=0;k<2;k++){
 			printf("\nTelefone: %d", professores[i].telefones[k]);
 		}
+		printf("\n\n");
 	}
 }
 ///////////////////////////////////////////////////////////////
@@ -125,7 +135,7 @@ void listarUmProf(struct Prof professores[], int *tamanho)
 	achou = buscarprof(professores, registro, tamanho);
 	if(achou!=-1){
 		printf("\nRegistro Funcional: %d \nNome: %s \nData de Nascimento: %d", professores[achou].reg_func, professores[achou].nome, professores[achou].data);
-		printf("\nSexo: %s \nArea de pesquisa: %s \nTitulacao: %s \nGraduacao: %s", professores[achou].sexo, professores[achou].area, professores[achou].titulo, professores[achou].grad);
+		printf("\nSexo: %c \nArea de pesquisa: %s \nTitulacao: %s \nGraduacao: %s", professores[achou].sexo, professores[achou].area, professores[achou].titulo, professores[achou].grad);
 		for(j=0;j<2;j++){
 			printf("\nEmail: %s",professores[achou].email[j]);
 		}
@@ -151,6 +161,7 @@ void alterarProf(struct Prof professores[], int *tamanho)
         fflush(stdin);
         printf("Digite o data de nascimento do professor dia/mes/ano, apenas numeros! (01012004)\n>>");
         scanf("%d", &professores[achou].data);
+        fflush(stdin);
         printf("Digite o sexo m (masculino) ou f (feminino)\n>>");
         scanf(" %c", &professores[achou].sexo);
         fflush(stdin);
@@ -173,7 +184,7 @@ void alterarProf(struct Prof professores[], int *tamanho)
             fflush(stdin);
         }
         else{
-        	strcpy(professores[achou].email[1],0);
+        	strcpy(professores[achou].email[1],"0");
 		}
         //adiciona telefones
         printf("Digite o/os telefones do professor (até 2)(apenas numeros)\n>>");
@@ -344,6 +355,265 @@ int excluirDisc(struct Disc disciplinas[], int *tamanho)
 }
 
 ///////////////////////////////////////////////////////////////
+//				FUNÇOES RELACIONADAS AOS PROF-DISCIPLINAS
+///////////////////////////////////////////////////////////////
+//                  define a funcao verificadora ou de busca de prof-disciplinas
+int buscarRegProf(struct ProfDisc professoresdisciplinas[], int registro, int *tamanho)
+{
+	int i;
+    for(i=0; i<=*tamanho; i++){
+        if(professoresdisciplinas[i].reg_func == registro){
+            return i;
+        }
+    }
+    return -1;
+}
+
+int buscarSig(struct ProfDisc professoresdisciplinas[], char sigla[], int *tamanho){
+    int i;
+    char materia[4];
+    
+    for(i=0; i<*tamanho; i++){
+    	strcpy(materia,professoresdisciplinas[i].sigla);
+        if(strcmp(sigla,materia)==0){
+            return i;
+        }
+    }
+    return -1;
+}
+
+int buscaAno(struct ProfDisc professoresdisciplinas[], int ano, int *tamanho)
+{
+	int i;
+    for(i=0; i<=*tamanho; i++){
+        if(professoresdisciplinas[i].ano == ano){
+            return i;
+        }
+    }
+    return -1;
+}
+
+int buscaSemestre(struct ProfDisc professoresdisciplinas[], int semestre, int *tamanho)
+{
+	int i;
+    for(i=0; i<=*tamanho; i++){
+        if(professoresdisciplinas[i].semestre == semestre){
+            return i;
+        }
+    }
+    return -1;
+}
+//////////////////////////////////////////////////////////////
+//                                    funcao de cadastra prof-disc
+int cadastraprofdisc(struct ProfDisc professoresdisciplinas[], struct Prof professores[],struct Disc disciplinas[],int *posprof, int *posdisc, int *posprofdisc){
+    int registro, achoureg, achousig, achouano, achousemestre, ano, semestre;
+    int achouRepReg, achouRepSig;
+    char sigla[4];
+    printf("Digite o registro do professor: \n>>");
+    scanf("%d",&registro);
+    fflush(stdin);
+    achoureg = buscarprof(professores, registro, posprof);
+    achouRepReg = buscarRegProf(professoresdisciplinas, registro, posprofdisc);
+    if(achoureg!=-1 && achouRepReg ==-1){
+        printf("Digite a sigla da disciplina: \n>>");
+        gets(sigla);
+        fflush(stdin);
+        achousig = buscardisc(disciplinas, sigla, posdisc);
+        achouRepSig = buscarSig(professoresdisciplinas, sigla, posprofdisc);
+        if(achousig != -1 && achouRepSig==-1){
+            printf("Digite o ano: \n>>");
+            scanf("%d", &ano);
+            fflush(stdin);
+            achouano= buscaAno(professoresdisciplinas, ano, posprofdisc);
+            if (achouano ==-1){
+            	printf("Digite o semestre: \n>>");
+	            scanf("%d", &semestre);
+	            fflush(stdin);
+	            achousemestre = buscaSemestre(professoresdisciplinas, semestre, posprofdisc);
+	            if (achousemestre ==-1){
+	            	professoresdisciplinas[*posprofdisc].reg_func = registro;
+	            	strcpy(professoresdisciplinas[*posprofdisc].sigla,sigla);
+	            	professoresdisciplinas[*posprofdisc].ano = ano;
+	            	professoresdisciplinas[*posprofdisc].semestre = semestre;
+	            	printf("Digite os dias da semana: \n>>");
+	            	gets(professoresdisciplinas[*posprofdisc].dias);
+	            	printf("Digite os horarios da aula: \n>>");
+	            	gets(professoresdisciplinas[*posprofdisc].horario);
+	            	printf("Digite o nome do curso: \n>>");
+	            	gets(professoresdisciplinas[*posprofdisc].curso);
+	            	(*posprofdisc)++;
+	            	fflush(stdin);
+	            	return 1;
+				}
+				else{
+					printf("\nSemestre ja existe\n");
+				}
+			}
+			else{
+				printf("\nAno ja existe\n");
+			}
+        }
+        else{
+            printf("\nSigla nao existe!\n");
+        }
+    }
+    else{
+        printf("\nRegistro funcional nao existe!\n");
+    }
+    return -1;
+}
+
+///////////////////////////////////////////////////////////////
+//  							Listar todos os prof-disciplinas
+void listartodasprofdisc(struct ProfDisc professoresdisciplinas[], int *tamanho)
+{
+	int i;
+	for (i=0;i<*tamanho;i++){
+		printf("\nRegistro Funcional Professor: %d \nSigla da Disciplina: %s \nAno: %d \nSemestre: %d", professoresdisciplinas[i].reg_func, professoresdisciplinas[i].sigla, professoresdisciplinas[i].ano, professoresdisciplinas[i].semestre);
+		printf("\nDias da semana: %s \nHorarios de aula: %s \nCurso: %s", professoresdisciplinas[i].dias, professoresdisciplinas[i].horario, professoresdisciplinas[i].curso);
+	}
+}
+
+///////////////////////////////////////////////////////////////
+// 										Listar um prof-disciplina
+void listarUmProfDisc(struct ProfDisc professoresdisciplinas[], int *tamanho)
+{
+	char sigla[4];
+	int registro, ano, semestre, achoureg, achousig, achouano, achousemestre;
+	printf("Digite o registro do professor: \n>>");
+    scanf("%d",&registro);
+    fflush(stdin);
+	printf("Digite a sigla da disciplina: \n>>");
+    gets(sigla);
+    fflush(stdin);
+    printf("Digite o ano: \n>>");
+    scanf("%d", &ano);
+    fflush(stdin);
+    printf("Digite o semestre: \n>>");
+    scanf("%d", &semestre);
+    fflush(stdin);
+	achoureg = buscarRegProf(professoresdisciplinas, registro, tamanho);
+	achousig = buscarSig(professoresdisciplinas, sigla, tamanho);
+	achouano = buscaAno(professoresdisciplinas, ano, tamanho);
+	achousemestre = buscaSemestre(professoresdisciplinas, semestre, tamanho);
+	
+	if(achoureg!=-1 && achousig !=-1 && achouano !=-1 && achousemestre !=-1){
+		printf("\nRegistro Funcional Professor: %d \nSigla da Disciplina: %s \nAno: %d \nSemestre: %d", professoresdisciplinas[achoureg].reg_func, professoresdisciplinas[achoureg].sigla, professoresdisciplinas[achoureg].ano, professoresdisciplinas[achoureg].semestre);
+		printf("\nDias da semana: %s \nHorarios de aula: %s \nCurso: %s", professoresdisciplinas[achoureg].dias, professoresdisciplinas[achoureg].horario, professoresdisciplinas[achoureg].curso);
+	}
+	else
+	printf("\nDados nao encontrados!\n");
+}
+
+///////////////////////////////////////////////////////////////
+//                                 alterar professoresdisciplinas
+
+int alterarProfDisc(struct ProfDisc professoresdisciplinas[], int *tamanho)
+{
+	int registro, achou;
+	printf("\nDigite o registro do professor para iniciar a alteracao: \n>>");
+    scanf("%d",&registro);
+    fflush(stdin);
+	achou = buscarRegProf(professoresdisciplinas, registro, tamanho);
+	if(achou!=-1){
+        fflush(stdin);
+        printf("Digite o ano atualizado\n>>");
+        scanf("%d", &professoresdisciplinas[achou].ano);
+        printf("Digite o semestre atualizado\n>>");
+        scanf(" %d", &professoresdisciplinas[achou].semestre);
+        fflush(stdin);
+        printf("Digite os dias de aulas atualizados\n>>");
+        gets(professoresdisciplinas[achou].dias);
+        printf("Digite os horarios de aulas atualizados\n>>");
+        gets(professoresdisciplinas[achou].horario);
+        printf("Digite o curso atualizados\n>>");
+        gets(professoresdisciplinas[achou].curso);
+        return achou;
+	}
+	else
+	return -1;
+}
+////////////////////////////////////////////////////////////////
+//                                       funcao para excluir professordisciplina
+int excluirProfDisc(struct ProfDisc professoresdisciplinas[], int *tamanho){
+	int registro, achoureg, achousig, achouano, achousemestre, i;
+	printf("\nDigite o registro de Professor-Disciplina: \n>>");
+    scanf("%d", &registro);
+    fflush(stdin);
+	achoureg = buscarRegProf(professoresdisciplinas, registro, tamanho);
+	if(achoureg!=-1){
+		for(i=achoureg;i<(*tamanho)-1;i++){
+			professoresdisciplinas[i] = professoresdisciplinas[i+1];
+		}
+		(*tamanho)--;
+		return 1;
+	}
+	else
+		return -1;
+}
+
+///////////////////////////////////////////////////////////////
+// 												RELATORIOS
+///////////////////////////////////////////////////////////////
+// 								todos professore por titulacao
+void profTitulo(struct Prof professores[], int *tamanho)
+{
+	int i, j, k;
+	char titulacao[40];
+	fflush(stdin);
+	printf("Digite a Titulacao: \n>>");
+	gets(titulacao);
+	fflush(stdin);
+	for (i=0;i<*tamanho;i++){
+		if (strcmp(titulacao,professores[i].titulo)==0){
+			printf("\nRegistro Funcional: %d \nNome: %s \nData de Nascimento: %d", professores[i].reg_func, professores[i].nome, professores[i].data);
+			printf("\nSexo: %c \nArea de pesquisa: %s \nTitulacao: %s \nGraduacao: %s", professores[i].sexo, professores[i].area, professores[i].titulo, professores[i].grad);
+			for(j=0;j<2;j++){
+				printf("\nEmail: %s",professores[i].email[j]);
+			}
+			for(k=0;k<2;k++){
+				printf("\nTelefone: %d", professores[i].telefones[k]);
+			}
+			printf("\n\n");
+		}
+	}
+}
+
+///////////////////////////////////////////////////////////////
+//									disciplinas por creditos
+void discCredito(struct Disc disciplinas[], int *tamanho)
+{
+	int i, creditos;
+	fflush(stdin);
+	printf("Digite o numero de creditos: \n>>");
+	scanf("%d", &creditos);
+	fflush(stdin);
+	for (i=0;i<*tamanho;i++){
+		if(disciplinas[i].numcred>=creditos){
+			printf("\nSigla: %s \nNome: %s \nEmenta: %s \nBibliografia: %s", disciplinas[i].sigla, disciplinas[i].nome, disciplinas[i].ementa, disciplinas[i].bibliografia );
+			printf("\nNumero de creditos: %d \nCarga horaria: %d", disciplinas[i].numcred, disciplinas[i].cargahora);
+		}
+	}
+}
+
+///////////////////////////////////////////////////////////////
+//								detalhes de prof e disc por dia da semana
+void diasEspecificos(struct ProfDisc professoresdisciplinas[], struct Prof professores[],struct Disc disciplinas[], int *posprof, int *posdisc, int *posprofdisc)
+{
+	int i, flag, flag2;
+	char terca[]="terca feira", quinta[]="quinta feira";
+	for (i=0;i<*posprofdisc;i++){
+		if(strcmp(professoresdisciplinas[i].dias,terca)==0 && strcmp(professoresdisciplinas[i].dias,quinta)==0){
+		    flag=buscardisc(disciplinas, professoresdisciplinas[i].sigla, posdisc);
+		    flag2=buscarprof(professores, professoresdisciplinas[i].reg_func, posprof);
+			printf("\nRegistro Funcional Professor: %d \nNome do Professor: %s \nSigla da Disciplina: %s \nNome da Disciplina: %s \nAno: %d \nSemestre: %d", professoresdisciplinas[i].reg_func, professores[flag2].nome,professoresdisciplinas[i].sigla, disciplinas[flag].nome,professoresdisciplinas[i].ano, professoresdisciplinas[i].semestre);
+			printf("\nDias da semana: %s \nHorarios de aula: %s \nCurso: %s", professoresdisciplinas[i].dias, professoresdisciplinas[i].horario, professoresdisciplinas[i].curso);
+		}
+	}
+	
+}
+
+///////////////////////////////////////////////////////////////
 //                                      DECLARA FUNCOES GERAIS
 ///////////////////////////////////////////////////////////////
 //                                   define a funcao menu_prof
@@ -351,9 +621,11 @@ void menu_prof(struct Prof professores[], int *posprof)
 {
     int opc=0, cadastrou;
 	while(opc != 6){
+		fflush(stdin);
 		printf("\n\nMenu de professores: \n1.Cadastrar  2.Mostrar todos  3.Mostrar UM  4.Alterar  5.Excluir  6.Sair");
 		printf("\nEscolha>> ");
         scanf("%d",&opc);
+        fflush(stdin);
         if(opc == 1){
             cadastrou = cadastraprof(professores, posprof);
             if(cadastrou == 1){
@@ -363,15 +635,19 @@ void menu_prof(struct Prof professores[], int *posprof)
             printf("\nUsuario ja esta cadastrado\n");
         }
         else if (opc==2){
+        	fflush(stdin);
         	listarTodosProf(professores, posprof);
 		}
 		else if(opc==3){
+			fflush(stdin);
 			listarUmProf(professores, posprof);
 		}
 		else if(opc==4){
+			fflush(stdin);
 			alterarProf(professores, posprof);
 		}
 		else if(opc==5){
+			fflush(stdin);
 			int deletado;
 			deletado = excluirProf(professores, posprof);
 			if (deletado!=-1){
@@ -428,17 +704,130 @@ void menu_disc(struct Disc disciplinas[], int *posdisc)
 		printf("\nOpcao invalida\n");
     }
 }
+
+
+///////////////////////////////////////////////////////////////
+//                                  declara a funcao menu_prof-disc
+void menu_profdisc(struct ProfDisc professoresdisciplinas[], struct Prof professores[],struct Disc disciplinas[], int *posprof, int *posdisc, int *posprofdisc){
+    int opc=0, cadastrou, flag;
+	while(opc != 6){
+		printf("\n\nMenu de Professor-disciplina: \n1.Cadastrar  2.Mostrar todas  3.Mostrar UMA  4.Alterar  5.Excluir  6.Sair");
+		printf("\nEscolha>> ");
+        scanf("%d",&opc);
+        if(opc == 1){
+	    	fflush(stdin);
+	        cadastrou = cadastraprofdisc(professoresdisciplinas, professores, disciplinas, posprof, posdisc, posprofdisc);//criar cadastro profdisc
+	        if(cadastrou == 1){
+	            printf("O cadastro foi bem-sucedido!");   
+	        }
+	        else{
+	        printf("\nProfessor-Disciplina ja esta cadastrada\n");
+	    	}
+    	}
+    	
+        else if (opc==2){
+            //criar listartodasprofdisc
+            listartodasprofdisc(professoresdisciplinas, posprofdisc);
+	    }
+	    
+	    else if(opc==3){
+	    	// listar um prof-disc
+		    listarUmProfDisc(professoresdisciplinas, posprofdisc);	    
+	    }
+	    
+		else if(opc==4){
+			fflush(stdin);
+			//criar um alterarprofdisc 
+			flag = alterarProfDisc(professoresdisciplinas, posprofdisc);
+			if(flag!=-1){
+			    printf("Alterado com sucesso!\n");
+			}
+			else{
+			    printf("Alteracao falhou!\n");
+			}
+		}
+		
+		else if(opc==5){
+			int deletado;
+			fflush(stdin);
+			deletado = excluirProfDisc(professoresdisciplinas, posprofdisc);//criar um removeprofdisc
+			if (deletado!=-1){
+				printf("\nExcluida com sucesso!\n");
+			}
+			else
+			printf("\nProfessor-Disciplina nao localizada\n");
+		}
+		else
+		printf("\nOpcao invalida\n");
+    }
+}
+
+void menu_relatorios(struct ProfDisc professoresdisciplinas[], struct Prof professores[], struct Disc disciplinas[], int *posprof, int *posdisc, int *posprofdisc)
+{
+	int opc=0, flag;
+	while(opc != 4){
+		printf("\n\nMenu de Relatorios: \n1.Professores por Titulos  2.Disciplinas por Creditos  3.Aulas as Tercas e Quintas  4.Sair\n");
+		printf("\nEscolha>> ");
+        scanf("%d",&opc);
+        if(opc==1)
+        {
+        	profTitulo(professores, posprof);
+		}
+		else if(opc==2)
+		{
+			discCredito(disciplinas, posdisc);
+		}
+		else if(opc==3)
+		{
+			diasEspecificos(professoresdisciplinas, professores, disciplinas, posprof, posdisc, posprofdisc);
+		}
+		else{
+			printf("\nOpcao invalida\n");
+		}
+	}
+}
+///////////////////////////////////////////////////////////////
+//                                              funcoes Abridora de Arquivos
+void abrearqprof(struct Prof *professores, int *posprof){
+	//atribui os arquivos aos vetores
+	FILE *p;
+	int flagp;
+	
+	if((p = fopen("arqprofessor.dat", "rb"))==NULL){
+		printf("Nao foi possivel abrir o arquivo de professores!\n");
+		exit(0);
+	}
+	while(!feof(p)){
+		if(flagp = fread(professores, sizeof(Prof),1,p)==1){
+			
+			posprof = (int *) realloc(posprof, )
+		}
+		
+	}
+	flagp = fread(professores, sizeof(Prof),1,p);
+	if(flagp != (*posprof))
+		printf("Nao foi possivel ler o registro\n");
+	fclose(p);
+
+	
+}
+
 //////////////////////////////////////////////////////////////
 // 												funcao MAIN
 int main(){
+	//funcao abrir os 3 arquivos e colocar nos vetores
+	
     //cria um vetor de professores
     struct Prof professores[max];
-    
+    malloc(1)
     //cria um vetor de disciplinas
     struct Disc disciplinas[max];
-    
+    funcao abrearquivo
+    //cria um vetor de profdisciplinas
+    struct ProfDisc professoresdisciplinas[max];
     //declara variaveis
-    int opc=0, codigo=0, achou=0, posprof = 0, posdisc = 0;
+    funcao abrearquivo
+    int opc=0, codigo=0, achou=0, posprof = 0, posdisc = 0, posprofdisc=0;
 
     //executa o menu principal enquanto opc for !=5
     while(opc != 5){
@@ -446,18 +835,31 @@ int main(){
         printf("\nMenu de opcoes: \n1.Professores  2.Disciplinas  3.Professores-Disciplina  4.Relatorios  5.Sair");
         printf("\nEscolha>> ");
         scanf("%d",&opc);
-
+		
         //chama menu professores
         if(opc==1){
-        	system("cls");
+			system("cls");
             menu_prof(professores, &posprof);
         }
         
         //chama menu Disciplinas
         else if(opc==2){
-        	system("cls");
+			system("cls");
             menu_disc(disciplinas, &posdisc);
         }
+        
+        //chama menu Profdisc
+        else if(opc==3){
+			system("cls");
+            menu_profdisc(professoresdisciplinas, professores, disciplinas, &posprof, &posdisc, &posprofdisc);
+        }
+        else if(opc==4){
+        	system("cls");
+        	menu_relatorios(professoresdisciplinas, professores, disciplinas, &posprof, &posdisc, &posprofdisc);
+		}
     }
+    f
+    fclose()
+    fclose()
+    fclose()
 }
-
